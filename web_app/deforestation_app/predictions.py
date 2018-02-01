@@ -9,6 +9,11 @@ from tqdm import tqdm
 from PIL import ImageFile                            
 ImageFile.LOAD_TRUNCATED_IMAGES = True 
 
+from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D
+from keras.layers import Dropout, Flatten, Dense
+from keras.models import Model
+from keras.applications.resnet50 import ResNet50
+
 def upload_to(filename):
     return 'images/{}'.format(filename)
 
@@ -20,12 +25,27 @@ class ImageUpload(models.Model):
 class CNN_Prediction(object):
     
     def __init__(self):
-        self.cnn_model = Sequential()
-        self.cnn_model.load_weights('saved_models/weights.best.ResNet50_deep.hdf5')
-        #needs to actually build this
+        #self.cnn_model = Sequential()
+        #self.cnn_model.load_weights('saved_models/weights.best.ResNet50_deep.hdf5')
+        self.classes = [
+            'agriculture', 'bare_ground', 'blooming', 'blow_down', 'clear',
+            'conventional_mine', 'cultivation', 'habitation', 'haze', 'partly_cloudy',
+            'primary', 'road', 'selective_logging', 'slash_burn', 'water', 'cloudy', 'artisinal_mine'
+        ]
+        
+    def build_ResNet50_Deep(self):
+        base_model_Resnet50 = ResNet50(include_top=False, input_shape=(256, 256, 3), weights='imagenet')
+        x = base_model_Resnet50.output
+        x = GlobalAveragePooling2D()(x)
+        predictions = Dense(len(self.classes), activation='sigmoid')(x)
+
+        model = Model(base_model_Resnet50.input, predictions)
+        model.load_weights('saved_models/weights.best.ResNet50_deep.hdf5')
+
+        return model
         
     def process_images(self):
-        image_files = np.array(['images/test_0.jpg', 'images/test_1.jpg'])
+        image_files = np.array(['images/test_0.jpg', 'images/test_1.jpg', 'images/test_2.jpg'])
         tensors = self.paths_to_tensor(image_files).astype('float32')/255
         return tensors
         
@@ -38,13 +58,33 @@ class CNN_Prediction(object):
         list_of_tensors = [self.path_to_tensor(img_path) for img_path in tqdm(img_paths)]
         return np.vstack(list_of_tensors)
     
-    def predict_image(self, tensors):
+    def predict_image(self, selected_model, tensors):
         predictions = []
         for tensor in tensors:
-            result = self.cnn_model.predict(np.expand_dims(tensor, axis=0))
+            result = selected_model.predict(np.expand_dims(tensor, axis=0))
             preds = result[0]
             preds[preds >= 0.5] = 1
             preds[preds < 0.5] = 0 
             predictions.append(preds)
 
         return predictions
+    
+    def convert_prediction(self, predictions):
+        labels = []
+        for result in predictions:
+            result_list = result.tolist()
+            label = []
+            for i in range(len(result_list)):
+                if result_list[i] == 1:
+                    label.append(self.classes[i])
+                    
+            labels.append(label)
+            
+        return labels
+    
+    
+    
+    
+    
+    
+    

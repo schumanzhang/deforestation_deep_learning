@@ -37,8 +37,10 @@ class GetBestPrediction(APIView):
     def get(self, request):
         cnn_model = CNN_Prediction()
         tensors = cnn_model.process_images()
-        predictions = cnn_model.predict_image(tensors)
-        return Response(predictions)
+        selected_model = cnn_model.build_ResNet50_Deep()
+        predictions = cnn_model.predict_image(selected_model, tensors)
+        labels = cnn_model.convert_prediction(predictions)
+        return Response({'predictions': labels})
 
 class GetImageUploadPredictionViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     

@@ -1,16 +1,26 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django import forms
 
-from rest_framework.decorators import detail_route, parser_classes
+from rest_framework.decorators import detail_route, parser_classes, list_route
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from rest_framework.viewsets import GenericViewSet
 
-from deforestation_app.predictions import ImageUpload
 from deforestation_app.predictions import CNN_Prediction
-from deforestation_app.serializers import ImageUploadSerializer
+
+'''
+class IsAdminOrIsSelf(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user or request.user.is_staff or request.user.is_superuser
+'''
+
+def handle_uploaded_file(f, filename):
+    with open('images/' + filename, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
 
 class OriginalModel(APIView):
     
@@ -42,32 +52,57 @@ class GetBestPrediction(APIView):
         labels = cnn_model.convert_prediction(predictions)
         return Response({'predictions': labels})
 
+
+class GetImagePrediction(APIView):
+    
+    def post(self, request):        
+        filename = request.data['image']
+        selection = request.data['modelName']
+        print(selection)
+        handle_uploaded_file(request.FILES['image'], str(filename))
+        
+        cnn_model = CNN_Prediction()
+        tensors = cnn_model.process_image(str(filename))
+        
+        if selection == 'ResNet50_deep':
+            selected_model = cnn_model.build_ResNet50_Deep()
+        elif selection == 'ResNet50_shallow':
+            selected_model = cnn_model.build_ResNet50_Shallow()
+        elif selection == 'Xception':
+            selected_model = cnn_model.build_Xception()
+        elif selection == 'original':
+            selected_model = cnn_model.build_Original()
+            
+        print('run prediction')
+        predictions = cnn_model.predict_image(selected_model, tensors)
+        labels = cnn_model.convert_prediction(predictions)
+        cnn_model.clear_models()
+        
+        return Response({'Location': 'images/' + str(filename), 'prediction': labels})
+
+
+'''
 class GetImageUploadPredictionViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     
     queryset = ImageUpload.objects.all()
     serializer_class = ImageUploadSerializer
     
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(GenericViewSet, self).__init__(*args, **kwargs)
     
-    @detail_route(methods=['POST'])
-    @parser_classes((FormParser, MultiPartParser))
-    def predict(self, request, *args, **kwargs):
+    @list_route(methods=['post'])
+    @parser_classes((FormParser, MultiPartParser,))
+    def image(self, request, *args, **kwargs):
         print('request')
         print(request.data)
-        if 'upload' in request.data:
-            print('GetImageUploadPredictionViewSet')
-            user_image = self.get_object()
-            
-            print(user_image)
-            user_image.image.delete()
-            
-            upload = request.data['upload']
-            print(upload)
-            user_image.image.save(upload.name, upload)
-            
-            # send the prediction back with the image
+        if 'image' in request.data:
+            upload = request.data['image']
+            user_image = ImageUpload()
+            user_image.save(upload)
             return Response(status=HTTP_201_CREATED, headers={'Location': user_image.image.url})
         else:
             return Response(status=HTTP_400_BAD_REQUEST)
+'''
+        
+
         

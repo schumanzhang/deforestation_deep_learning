@@ -11,7 +11,7 @@ from deforestation_app import models
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     #url(r'^predict/', include(router.urls)),
-    url(r'^$', TemplateView.as_view(template_name='frontend/index.html')),
+    url(r'^$', TemplateView.as_view(template_name='index.html')),
     url(r'^deforestation_app/api/original', models.OriginalModel.as_view()),
     url(r'^deforestation_app/api/resnet-shallow', models.ResNet50ModelShallow.as_view()),
     url(r'^deforestation_app/api/resnet-deep', models.ResNet50ModelDeep.as_view()),

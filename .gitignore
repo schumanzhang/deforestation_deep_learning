@@ -3,3 +3,6 @@ data/
 images/
 .ipynb_checkpoints/
 saved_models/
+*.pyc
+node_modules/
+

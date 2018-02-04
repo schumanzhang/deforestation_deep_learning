@@ -102,6 +102,17 @@ class GetImageUploadPredictionViewSet(RetrieveModelMixin, UpdateModelMixin, Gene
             return Response(status=HTTP_201_CREATED, headers={'Location': user_image.image.url})
         else:
             return Response(status=HTTP_400_BAD_REQUEST)
+            
+
+pickle_model_history = []
+with (open('saved_models/original_model', "rb")) as openfile:
+    while True:
+        try:
+            pickle_model_history.append(pickle.load(openfile))
+        except EOFError:
+            break
+
+print(pickle_model_history)
 '''
         
 

@@ -9,3 +9,6 @@ scikit-learn==0.18.1
 pillow==4.0.0
 ipykernel==4.6.1
 tensorflow-gpu==1.0.0
+django==1.11.9
+djangorestframework==3.7.7
+django-cors-headers==2.1.0

@@ -25,22 +25,22 @@ def handle_uploaded_file(f, filename):
 class OriginalModel(APIView):
     
     def get(self, request):
-        return Response({'Recall score': 0.69, 'Precision score': 0.82, 'Fbeta score': 0.70})
+        return Response({'Recall_score': 0.69, 'Precision_score': 0.82, 'Fbeta_score': 0.70})
     
 class ResNet50ModelShallow(APIView):
     
     def get(self, request):
-        return Response({'Recall score': 0.79, 'Precision score': 0.85, 'Fbeta score': 0.80})
+        return Response({'Recall_score': 0.79, 'Precision_score': 0.85, 'Fbeta_score': 0.80})
     
 class ResNet50ModelDeep(APIView):
     
     def get(self, request):
-        return Response({'Recall score': 0.83, 'Precision score': 0.89, 'Fbeta score': 0.84})
+        return Response({'Recall_score': 0.83, 'Precision_score': 0.89, 'Fbeta_score': 0.84})
 
 class XceptionModel(APIView):
     
     def get(self, request):
-        return Response({'Recall score': 0.68, 'Precision score': 0.82, 'Fbeta score': 0.68})
+        return Response({'Recall_score': 0.68, 'Precision_score': 0.82, 'Fbeta_score': 0.68})
     
 class GetBestPrediction(APIView):    
     
@@ -55,14 +55,15 @@ class GetBestPrediction(APIView):
 
 class GetImagePrediction(APIView):
     
-    def post(self, request):        
+    def post(self, request):    
+        print(request.data)
+        filelink = request.data['imageName']
         filename = request.data['image']
         selection = request.data['modelName']
-        print(selection)
-        handle_uploaded_file(request.FILES['image'], str(filename))
+        handle_uploaded_file(request.FILES['image'], filelink)
         
         cnn_model = CNN_Prediction()
-        tensors = cnn_model.process_image(str(filename))
+        tensors = cnn_model.process_image(filelink)
         
         if selection == 'ResNet50_deep':
             selected_model = cnn_model.build_ResNet50_Deep()
@@ -73,12 +74,12 @@ class GetImagePrediction(APIView):
         elif selection == 'original':
             selected_model = cnn_model.build_Original()
             
-        print('run prediction')
         predictions = cnn_model.predict_image(selected_model, tensors)
         labels = cnn_model.convert_prediction(predictions)
         cnn_model.clear_models()
         
-        return Response({'Location': 'images/' + str(filename), 'prediction': labels})
+        print('finish prediction')
+        return Response({'Location': 'images/' + filelink, 'prediction': labels})
 
 
 '''

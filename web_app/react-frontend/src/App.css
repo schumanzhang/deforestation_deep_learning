@@ -1,0 +1,87 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 45px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 80px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+body {
+    background-color: #ecf0f1;
+}
+
+.app-card {
+    margin-top: 25px;   
+}
+
+.app-card-right {
+    margin-top: 25px;   
+    min-height: 557px;
+}
+
+.image-input {
+    margin-top: 30px;   
+    margin-bottom: 30px; 
+}
+
+.image-box {
+    border: 3px dotted #34495e;
+    min-height: 350px;
+    padding: 20px 20px 20px 20px;
+    position: relative;
+    text-align: center;
+}
+
+.form-control-file {    
+    display: inline-block;
+    position: absolute;
+    top: 50%; 
+    left: 20%;
+}
+
+.ring-loader-box {
+    min-height: 350px;
+    position: relative;
+    padding: 40px 40px 40px 40px;
+}
+
+.show-image-box {
+    min-height: 350px;
+    padding: 20px 20px 20px 20px;
+    position: relative;
+    text-align: center;
+}
+
+.display-image {
+    width: 320px;
+    height: 320px;
+}
+
+
+
+
+
+
+

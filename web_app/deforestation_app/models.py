@@ -25,12 +25,12 @@ def handle_uploaded_file(f, filename):
 class OriginalModel(APIView):
     
     def get(self, request):
-        return Response({'Recall_score': 0.69, 'Precision_score': 0.82, 'Fbeta_score': 0.70})
+        return Response({'Recall_score': 0.72, 'Precision_score': 0.79, 'Fbeta_score': 0.73})
     
 class ResNet50ModelShallow(APIView):
     
     def get(self, request):
-        return Response({'Recall_score': 0.79, 'Precision_score': 0.85, 'Fbeta_score': 0.80})
+        return Response({'Recall_score': 0.79, 'Precision_score': 0.85, 'Fbeta_score': 0.79})
     
 class ResNet50ModelDeep(APIView):
     

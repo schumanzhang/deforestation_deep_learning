@@ -39,7 +39,7 @@ class Details extends Component {
                         <div className="show-image-box">
                             <img className="display-image" src={this.state.imageLink}/>
                         </div>
-            
+                        <br/>
                         <p>
                             <strong>Prediction:</strong> 
                             {this.state.prediction}
